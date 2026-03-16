@@ -1,11 +1,9 @@
 import feedparser
 import sqlite3
-from datetime import datetime, timezone, timedelta
 
 URL = "https://g1.globo.com/rss/g1/"
 
-FUSO_BRASILIA = timezone(timedelta(hours=-3))
-
+# inicia o db
 def criar_banco():
     conn = sqlite3.connect("noticias.db")
     cursor = conn.cursor()
@@ -21,6 +19,7 @@ def criar_banco():
     conn.commit()
     return conn
 
+# salva as noticias no db
 def salvar_noticias(conn, noticias, fonte):
     cursor = conn.cursor()
     salvas = 0
@@ -43,6 +42,7 @@ def salvar_noticias(conn, noticias, fonte):
     conn.commit()
     print(f"✅ {salvas} notícias salvas no banco!")
 
+# busca as noticias
 def buscar_noticias(url):
     feed = feedparser.parse(url)
     fonte = feed.feed.get("title", "Desconhecida") # type: ignore
@@ -50,7 +50,7 @@ def buscar_noticias(url):
     print(f"{len(feed.entries)} notícias encontradas")
     return feed.entries, fonte
 
-# Execução principal
+# executa o banco
 conn = criar_banco()
 noticias, fonte = buscar_noticias(URL)
 salvar_noticias(conn, noticias, fonte)
