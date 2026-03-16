@@ -1,10 +1,13 @@
 import feedparser
 import sqlite3
+from datetime import datetime, timezone, timedelta
 
 URL = "https://g1.globo.com/rss/g1/"
 
+FUSO_BRASILIA = timezone(timedelta(hours=-3))
+
 def criar_banco():
-    conn = sqlite3.connect ("noticias.db")
+    conn = sqlite3.connect("noticias.db")
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS noticias (
@@ -18,41 +21,37 @@ def criar_banco():
     conn.commit()
     return conn
 
-def salvar_noticias (conn, noticias, fonte):
+def salvar_noticias(conn, noticias, fonte):
     cursor = conn.cursor()
     salvas = 0
 
     for noticia in noticias:
         try:
-            cursor.execute ("""
+            cursor.execute("""
                 INSERT INTO noticias (titulo, link, publicado, fonte)
-                VALUES (?, ?, ?, ?)    
+                VALUES (?, ?, ?, ?)
             """, (
-                noticia.get ("title", "Sem título"),
-                noticia.get ("link", ""),
-                noticia.get ("published", ""),
+                noticia.get("title", "Sem título"),
+                noticia.get("link", ""),
+                noticia.get("published", ""),
                 fonte
             ))
             salvas += 1
         except sqlite3.IntegrityError:
-            pass
+            pass  # notícia já existe no banco, ignora
 
-    conn.commit ()
-    print (f"✅ {salvas} notícias salvas no banco!")
+    conn.commit()
+    print(f"✅ {salvas} notícias salvas no banco!")
 
-def buscar_noticias (url):
-    feed = feedparser.parse (url)
+def buscar_noticias(url):
+    feed = feedparser.parse(url)
     fonte = feed.feed.get("title", "Desconhecida") # type: ignore
-    print (f"📡 Buscando de: {fonte}")
-    print (f"{len(feed.entries)} notícias encontradas")
+    print(f"📡 Buscando de: {fonte}")
+    print(f"{len(feed.entries)} notícias encontradas")
     return feed.entries, fonte
 
-
-# cria o banco e guarda a conexão
+# Execução principal
 conn = criar_banco()
-# busca as notícias e guarda na variável 'notícias' e o nome da fonte em 'fonte'
-noticias, fonte = buscar_noticias (URL)
-# salva tudo no db
-salvar_noticias (conn, noticias, fonte)
-# fecha a conexão
-conn.close ()
+noticias, fonte = buscar_noticias(URL)
+salvar_noticias(conn, noticias, fonte)
+conn.close()
