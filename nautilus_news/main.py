@@ -6,10 +6,10 @@ from datetime import datetime
 
 # fontes RSS
 FONTES = [
-    {"nome": "G1", "url": "https://g1.globo.com/rss/g1/"},  
+    {"nome": "G1",               "url": "https://g1.globo.com/rss/g1/"},
     {"nome": "Intercept Brasil", "url": "https://intercept.com.br/feed/"},
-    {"nome": "Brasil de Fato", "url": "https://www.brasildefato.com.br/feed/"},
-    {"nome": "ICL Notícias", "url": "https://iclnoticias.com.br/feed/"},  
+    {"nome": "ICL Notícias",     "url": "https://iclnoticias.com.br/feed/"},
+    {"nome": "Brasil de Fato",   "url": "https://www.brasildefato.com.br/feed/"},
 ]
 
 # banco de dados
@@ -59,7 +59,7 @@ def busca_salva_todas (conn, fontes, log_callback = None):
         except Exception as e:
             if log_callback:
                 log_callback (f"⚠️ Erro em {fonte['nome']}: {e}")
-        return total
+    return total
     
 def carregar_noticias (conn):
     cursor = conn.cursor ()
@@ -72,10 +72,10 @@ def carregar_noticias (conn):
 
 # cores por fonte
 CORES_FONTE = {
-    "G1": "#bd0000",
-    "Intercept Brasil": "#2e2e2e",
-    "Brasil de Fato": "#FF0000",
-    "ICL Notícias": "#0062f5",
+    "G1":               "#ff0000",
+    "Intercept Brasil": "#2c2c2c",
+    "ICL Notícias":     "#1a6bbf",
+    "Brasil de Fato":   "#FF0000",
 }
 
 def cor_fonte (nome):
@@ -154,7 +154,7 @@ def construir_interface (conn):
                 hover_color = "#2d333b",
                 font = ctk.CTkFont (size = 13),
                 text_color = "#c9d1d9",
-                command = lambda l = link: abrir_link (1),
+                command = lambda l = link: abrir_link (l),
             )
             btn.pack (fill = "x", padx = 6, pady = (0, 2))
 
